@@ -1,0 +1,715 @@
+#include<stdio.h>
+#include<conio.h>
+#include<stdlib.h>
+#include <windows.h>
+#define color SetConsoleTextAttribute
+
+void gotoxy(int x, int y) {
+    HANDLE hcon;
+    hcon = GetStdHandle(STD_OUTPUT_HANDLE);
+    COORD dwPos;
+    dwPos.X = x;
+    dwPos.Y = y;
+    SetConsoleCursorPosition(hcon, dwPos);
+}
+
+struct info {
+    char nombre[20];
+    int edad;
+    char carrera[20];
+    int semestre;
+};
+
+struct nodo {
+    int matricula;
+    struct info dir;
+    struct nodo *liga;
+};
+
+struct nodo *crea() {
+    struct nodo *paux;
+    paux = (struct nodo *)malloc(sizeof(struct nodo));
+    if (paux != NULL) {
+        paux->liga = NULL;  
+    }
+    return paux;
+}
+
+struct nodo *agregarAlFinal(struct nodo *inicio, struct nodo *nuevo) {
+    if (inicio == NULL) {
+        return nuevo;  
+    }
+
+    struct nodo *actual = inicio;
+    while (actual->liga != NULL) {
+        actual = actual->liga;
+    }
+
+    actual->liga = nuevo; 
+    return inicio;  
+}
+
+void imprimirCuadro(int c, int f, struct nodo *p) {
+    gotoxy(c, f);
+    printf("%c", 218);
+    printf("%c%c%c%c%c%c%c%c%c%c%c", 196, 196, 196, 196, 196, 196, 196, 196, 196, 196, 196);
+    if (p->matricula != -1) {
+        gotoxy(c + 3, f + 1);
+        printf("%d", p->matricula);
+    }
+    gotoxy(c + 12, f);
+    printf("%c", 191);
+    gotoxy(c, f + 1);
+    printf("%c", 179);
+    gotoxy(c + 9, f + 1);
+    printf("%c", 179);
+    gotoxy(c + 12, f + 1);
+    printf("%c", 179);
+    gotoxy(c, f + 2);
+    printf("%c%c%c%c%c%c%c%c%c%c%c%c", 192, 196, 196, 196, 196, 196, 196, 196, 196, 196, 196, 196);
+    gotoxy(c + 12, f + 2);
+    printf("%c", 217);
+    gotoxy(c + 14, f + 1);
+    printf("%c%c%c", 196, 196, 62);
+    gotoxy(c + 3, f + 1);
+    if (p->matricula != -1) {
+        printf("%d", p->matricula);
+    }
+}
+
+void mensajeRepresentacion(struct nodo *p) {
+    int columna = 5;
+    struct nodo *actual = p;
+    while (actual != NULL) {
+        imprimirCuadro(columna, 30, actual);
+        columna += 18; 
+        actual = actual->liga;
+    }
+    getchar();
+}
+
+
+void nota()
+{
+    int x, y;
+    x = 58;
+    gotoxy(x, 5);
+    printf("%c", 218);
+    gotoxy(x, 20);
+    printf("%c", 192);
+    for (x = 59; x <= 110; x++)
+    {
+        gotoxy(x, 5);
+        printf("%c", 196);
+        gotoxy(x, 20);
+        printf("%c", 196);
+        gotoxy(x, 9);
+        printf("%c", 196);
+    }
+    for (y = 6; y <= 19; y++)
+    {
+        gotoxy(58, y);
+        printf("%c", 179);
+        gotoxy(110, y);
+        printf("%c", 179);
+    }
+    gotoxy(110, 5);
+    printf("%c", 191);
+    gotoxy(110, 20);
+    printf("%c", 217);
+}
+
+void margen2()
+{
+    int x, y;
+    x = 20;
+    gotoxy(x, 1);
+    printf("%c", 218);
+    gotoxy(x, 26);
+    printf("%c", 192);
+    for (x =21; x <= 111; x++)
+    {
+        gotoxy(x, 1);
+        printf("%c", 196);
+        gotoxy(x, 26);
+        printf("%c", 196);
+    }
+    for (y = 2; y <= 25; y++)
+    {
+        gotoxy(20, y);
+        printf("%c", 179);
+        gotoxy(112, y);
+        printf("%c", 179);
+    }
+    gotoxy(112, 1);
+    printf("%c", 191);
+    gotoxy(112, 26);
+    printf("%c", 217);
+    
+   x = 30;
+    gotoxy(x, 2);
+    printf("%c", 218);
+    gotoxy(x, 4);
+    printf("%c", 192);
+
+    for (x = 31; x <= 94; x++)
+    {
+        gotoxy(x, 2);
+        printf("%c", 196);
+        gotoxy(x, 4);
+        printf("%c", 196);
+    }
+    gotoxy(30, 3);
+    printf("%c", 179);
+    gotoxy(94, 3);
+    printf("%c", 179);
+    gotoxy(94, 2);
+    printf("%c", 191);
+    gotoxy(94, 4);
+    printf("%c", 217);
+
+}
+
+void mensajeDespedida() {
+	int i;
+	HANDLE hConsole = GetStdHandle( STD_OUTPUT_HANDLE );
+    for ( i = 0; i < 5; i++) {
+        system("cls");
+       /*/ margen2();
+        gotoxy(45,3);
+        printf("Fin del programa");/*/
+        gotoxy(35, 15);
+        color(hConsole,2);
+        printf("Gracias por usar el programa, saliendo...");
+        Sleep(500);
+        system("cls");
+        Sleep(500);
+        color(hConsole,7);
+        
+    }
+}
+
+
+
+struct nodo *crea();
+struct nodo *mostrar(struct nodo *p);
+struct nodo *datos(struct nodo *p);
+struct nodo *buscar(struct nodo *p);
+struct nodo *modificar(struct nodo *p);
+struct nodo *ordenar(struct nodo *p);
+int menu();
+int respuesta();
+void gotoxy(int x,int y);
+
+
+struct nodo *guardarEnArchivo(struct nodo *p) {
+    FILE *flujo = fopen("alumnos1.txt", "a");
+
+    if (flujo == NULL) {
+        perror("Error al abrir el archivo para escribir.\n");
+    }else{
+	
+
+    while (p != NULL) {
+        fprintf(flujo, "%d", p->matricula);
+        //fputc('\n',flujo);
+        fputs( p->dir.nombre,flujo);
+        //fputc('\n',flujo);
+        fprintf(flujo, "%d", p->dir.edad);
+     	//fputc('\n',flujo);
+        fprintf(flujo, "%s", p->dir.carrera);
+      //  fputc('\n',flujo);
+		fprintf(flujo, "%d", p->dir.semestre);
+	//	fputc('\n',flujo);
+        p = p->liga;
+    
+	}
+}
+	fflush(flujo);
+    fclose(flujo);
+}
+
+struct nodo *leerDesdeArchivo() {
+	struct nodo*inicio=NULL;
+    int matricula, edad, semestre;
+    char nombre[20], carrera[20];
+
+    FILE *flujo = fopen("alumnos1.txt", "rb");
+
+    if (flujo == NULL) {
+        perror("Error en la apertura del archivo");
+    }
+
+    while (fscanf(flujo, "%d %[^\n]s %d %[^\n]s %d",&matricula, nombre, &edad, carrera,&semestre ) == 5) {
+    	struct nodo *nuevo=crea();
+		nuevo->matricula=matricula;
+		strcpy(nuevo->dir.nombre,nombre);
+		nuevo->dir.edad=edad;
+		strcpy(nuevo->dir.carrera,carrera);
+		nuevo->dir.semestre,semestre;
+		
+		nuevo->liga=inicio;
+		inicio=nuevo;
+    }
+    
+    gotoxy(40,15);
+	printf("Los datos han sido cargados correctamente");
+	gotoxy(50,25);
+    printf("Presione enter para regresar al men%c.",163);
+    getchar();
+
+    fclose(flujo);
+    return inicio;
+}
+
+
+struct nodo *eliminar(struct nodo *inicio, int matricula) {
+    struct nodo *actual = inicio;
+    struct nodo *anterior = NULL;
+
+    while (actual != NULL && actual->matricula != matricula) {
+        anterior = actual;
+        actual = actual->liga;
+    }
+
+    if (actual == NULL) {
+        return inicio;
+    }
+
+    if (anterior == NULL) {
+        inicio = actual->liga;
+    } else {
+        anterior->liga = actual->liga;
+    }
+
+    free(actual);  
+    return inicio;  
+}
+
+int main(){
+	HANDLE hConsole = GetStdHandle( STD_OUTPUT_HANDLE );
+	struct nodo *p=NULL,*q=NULL;
+	int opcion,band=0,res;
+	do{
+		opcion=menu();
+		switch(opcion){
+		 case 1:
+                margen2();
+                gotoxy(33, 3);
+                color(hConsole, 3);
+                printf("I N G R E S O  D E  D A T O S  D E L  A L U M N O");
+                color(hConsole, 7);
+                if (band == 0) {
+                    p = crea();
+                    datos(p);
+                    p->liga = NULL;
+                    band = 1;
+                    mensajeRepresentacion(p);
+                } else {
+                    struct nodo *nuevoAlumno = crea();
+                    datos(nuevoAlumno);
+                    p = agregarAlFinal(p, nuevoAlumno);
+                    mensajeRepresentacion(p);
+                }
+                break;
+
+			case 2:
+    			margen2();
+    			gotoxy(38, 3);
+    			color(hConsole, 3);
+    			printf("D A R   D E   B A J A   U N   A L U M N O");
+    			color(hConsole, 7);
+    			q = buscar(p);
+
+    			if (q != NULL) {
+        		gotoxy(35, 16);
+        		printf("%cEst%c seguro de eliminar los datos%c (1: S%c  2: No): ", 168, 160, 63, 161);
+        		gotoxy(86, 16);
+        		scanf("%d", &res);
+
+        		if (res == 1) {
+            		p = eliminar(p, q->matricula);  
+            		mensajeRepresentacion(p);
+            		gotoxy(45, 20);
+            		color(hConsole, 2);
+            		printf("Datos eliminados exitosamente.");
+            		color(hConsole, 7);
+            		getchar();
+        		} else {
+            		gotoxy(45, 20);
+            		getchar();
+            		color(hConsole, 4);
+            		printf("Operaci%cn de eliminaci%cn cancelada.", 162, 162);
+            		color(hConsole, 7);
+            		getchar();
+        		}
+    			}
+    		break;
+
+			case 3: 
+				margen2();
+				gotoxy(38,3);
+            	color(hConsole,3);
+            	printf("B U S C A R   U N   A L U M N O");
+            	color(hConsole,7);
+				buscar(p);
+				gotoxy(45,22); printf("Presione enter para regresar al men%c",163);
+			//	mensajeRepresentacion(p);
+				getchar();
+				break;
+			case 4: 
+				margen2();
+				mensajeRepresentacion(p);
+				gotoxy(38,3);
+            	color(hConsole,3);
+            	printf("M O D I F I C A R   D A T O S   D E   U N   A L U M N O");
+            	color(hConsole,7);
+				modificar(p);
+				break;
+			case 5:
+    			margen2();
+    			gotoxy(38, 3);
+    			color(hConsole, 3);
+    			printf(" O R D E N A R   D A T O S - M E R G E S O R T");
+    			color(hConsole, 7);
+    			p = ordenar(p);  
+    			mensajeRepresentacion(p);
+    			getchar();
+    			break;
+		    case 6:
+   				margen2();
+    			gotoxy(38, 3);
+    			color(hConsole, 3);
+    			printf(" A L M A C E N A R   D A T O S   E N   A R C H I V O");
+    			color(hConsole, 7);
+    			guardarEnArchivo(p);
+    			break;
+            case 7:
+                margen2();
+                gotoxy(38, 3);
+                color(hConsole, 3);
+                printf(" L E E R   D A T O S   D E S D E   A R C H I V O");
+                color(hConsole, 7);
+               free(p); 
+                p = leerDesdeArchivo();
+                getchar();
+               // system("pause");
+                break;
+            case 8:
+            	mensajeDespedida();
+            	break;
+		}
+	}while(opcion!=8);
+	
+}
+
+
+
+struct nodo *mostrar(struct nodo *p){
+	gotoxy(68,10);printf("Matr%ccula: ",161);
+	gotoxy(80,10);printf("%d",p->matricula);
+	gotoxy(68,11);printf("Nombre: ");
+	gotoxy(76,11);puts(p->dir.nombre);
+	gotoxy(68,12);printf("Edad: ");
+	gotoxy(75,12);printf("%d",p->dir.edad);
+	gotoxy(68,13);printf("Carrera: ");
+	gotoxy(77,13);puts(p->dir.carrera);
+	gotoxy(68,14);printf("Semestre: ");
+	gotoxy(78,14);printf("%d",p->dir.semestre);
+}
+
+struct nodo *datos(struct nodo *p){
+	gotoxy(23,6); 
+	printf("Ingrese la matr%ccula del alumno: ",161);
+	gotoxy(25,8);
+	printf("---------------------------------");
+	gotoxy(25,7); scanf("%d%*c",&p->matricula);
+	
+	gotoxy(23,10);
+    printf("Ingrese el nombre del alumno: ");
+    gotoxy(25,12);
+	printf("---------------------------------");
+	gotoxy(25,11);gets(p->dir.nombre);
+	
+	gotoxy(23,14);
+	printf("Ingrese la edad del alumno: ");
+	gotoxy(25,16);
+	printf("---------------------------------");
+	gotoxy(25,15);
+	scanf("%d%*c",&p->dir.edad);
+	
+	gotoxy(23,18);
+	printf("Ingrese la carrera del alumno: ");
+	gotoxy(25,20);
+	printf("---------------------------------");
+	gotoxy(25,19);
+	gets(p->dir.carrera);
+	
+	gotoxy(23,22);
+	printf("Ingrese el semestre del alumno: ");
+	gotoxy(25,24);
+	printf("---------------------------------");
+	gotoxy(25,23);
+	scanf("%d%*c",&p->dir.semestre);
+	
+	gotoxy(45,25);
+	printf("Presione enter para regresar al menu");
+	getchar();
+	//gotoxy(35,13); system("pause");
+}
+struct nodo *buscar(struct nodo *p){
+	HANDLE hConsole = GetStdHandle( STD_OUTPUT_HANDLE );
+	struct nodo *aux;
+	int matricula;
+	int band=0;
+	aux = p;
+	margen2();
+	/*/color(hConsole,3);
+	gotoxy(33,3); printf(" B U S C A R  A L U M N O");
+	color(hConsole,7);/*/
+	gotoxy(23,10); 
+	printf("Ingrese la matr%ccula del alumno: ",161);
+	gotoxy(25,12);
+	printf("---------------------------------");
+	gotoxy(25,11);
+	scanf("%d%*c",&matricula);
+	while(aux != NULL){
+		if(aux->matricula == matricula){
+			mostrar(aux);
+		//	getchar();
+			band=1;
+			return aux;
+		}
+		else
+			aux = aux->liga;
+	}
+	if(band == 0){
+		gotoxy(45,20); printf("El alumno no esta registrado");
+		gotoxy(45,22); printf("Presione enter para regresar al men%c",163);
+		getchar();
+	} 
+	return NULL;
+}
+struct nodo *modificar(struct nodo *q) {
+    struct nodo *p = NULL;
+    int opcion, res;
+    p = buscar(q);
+    if (p != NULL) {
+        do {
+            margen2();
+			//system("cls");
+            mostrar(p);
+            
+            gotoxy(65, 11);
+            printf("1. ");
+            gotoxy(65, 12);
+            printf("2. ");
+            gotoxy(65, 13);
+            printf("3. ");
+            gotoxy(65, 14);
+            printf("4. ");
+			
+			gotoxy(23,23);
+            printf("Ingrese el n%cmero del campo que desea modificar: ",163);
+            gotoxy(73,23);
+            printf("  ");
+            gotoxy(73,23);
+            scanf("%d", &opcion);
+            
+
+            switch (opcion) {
+                case 1:
+                    gotoxy(76, 11);
+                    printf("                ");
+                    gotoxy(76, 11);
+                    scanf("%s", p->dir.nombre);
+                    break;
+                case 2:
+                    gotoxy(72, 12);
+                    printf("                ");
+                    gotoxy(72, 12);
+                    scanf("%d", &p->dir.edad);
+                    break;
+                case 3:
+                    gotoxy(76, 13);
+                    printf("                ");
+                    gotoxy(76, 13);
+                    scanf("%s", p->dir.carrera);
+                    break;
+                case 4:
+                    gotoxy(76, 14);
+                    printf("                ");
+                    gotoxy(76, 14);
+                    scanf("%d", &p->dir.semestre);
+                    break;
+                default:
+                    printf("Opci%cn no v%clida. Por favor, ingrese un n%cmero v%clido.",162,160,163,160);
+                    break;
+            }
+	
+			gotoxy(23,25);
+            printf("%cDesea modificar otro dato del alumno%c (1: S%c, 2: No): ",168,63,161);
+            gotoxy(23,83);
+            scanf("%d", &res);
+
+            gotoxy(23,25);
+			printf("                                                     ");
+			gotoxy(23,83);
+            printf("     ");
+
+        } while (res == 1);
+    }
+    return p;
+}
+
+
+struct nodo *merge(struct nodo *left, struct nodo *right) {
+    struct nodo *result = NULL;
+
+    if (left == NULL)
+        return right;
+    if (right == NULL)
+        return left;
+
+    if (left->matricula <= right->matricula) {
+        result = left;
+        result->liga = merge(left->liga, right);
+    } else {
+        result = right;
+        result->liga = merge(left, right->liga);
+    }
+
+    return result;
+}
+
+struct nodo *mergeSort(struct nodo *p) {
+    if (p == NULL || p->liga == NULL)
+        return p;
+
+    struct nodo *middle = NULL;
+    struct nodo *secondHalf = NULL;
+    struct nodo *temp = p;
+
+    middle = p;
+    while (temp->liga != NULL && temp->liga->liga != NULL) {
+        middle = middle->liga;
+        temp = temp->liga->liga;
+    }
+
+    secondHalf = middle->liga;
+    middle->liga = NULL;
+
+    p = mergeSort(p);
+    secondHalf = mergeSort(secondHalf);
+    return merge(p, secondHalf);
+}
+
+struct nodo *ordenar(struct nodo *p) {
+    p = mergeSort(p);
+
+    int x = 23;
+    int y = 10;
+
+    struct nodo *current = p;
+    while (current != NULL) {
+    	
+    	gotoxy(23,9); printf("Matr%ccula",161);
+    	gotoxy(35,9); printf("Nombre");
+    	gotoxy(70,9); printf("Edad");
+    	gotoxy(77,9); printf("Carrera");
+    	gotoxy(90,9); printf("Semestre");
+    	
+        gotoxy(x, y);
+        printf("   %d      %s                           %d       %s             %d",
+               current->matricula, current->dir.nombre, current->dir.edad,
+               current->dir.carrera, current->dir.semestre);
+        y++;
+
+        current = current->liga;
+    }
+
+    return p;
+}
+
+
+
+
+
+int menu(){
+	HANDLE hConsole = GetStdHandle( STD_OUTPUT_HANDLE );
+	int opcion = 1;
+    char tecla;
+	do{
+		system("cls");
+		margen2();
+		gotoxy(45,3);
+		color(hConsole,3);
+        printf("M E N %c   D E   O P E R A C I O N E S",233);
+        color(hConsole,7);
+        
+		gotoxy(25,12); printf("Alta               (   )");
+		gotoxy(25,13); printf("Baja               (   )");
+		gotoxy(25,14); printf("Consulta           (   )");
+		gotoxy(25,15); printf("Modificaciones     (   )");
+		gotoxy(25,16); printf("Ordenar            (   )");
+		gotoxy(25,17); printf("Almacenar datos    (   )");
+		gotoxy(25,18); printf("Leer datos         (   )");
+		gotoxy(25,19); printf("Salir              (   )");
+		
+		nota();
+		color(hConsole,1);
+		gotoxy(75,7);  printf("   N  O  T  A  " );
+		color(hConsole,7);
+		gotoxy(60,11); printf("- Use las flechas de flujo para eligir la opci%cn",162);
+		gotoxy(60,12); printf("del men%c, para seleccionar use la inicial de ",163);
+		gotoxy(60,13); printf("la opci%cn elegida",162);
+		gotoxy(60,15); printf("- Solo letras minusculas");
+		gotoxy(60,17); printf("- Para la opci%cn de almacenar datos,usar d",162);
+		gotoxy(60,19); printf("- No es necesario presionar ENTER despu%cs.",130);
+		gotoxy(46,11+opcion); printf("");
+		
+		tecla = getch();
+        switch (tecla) {
+            case 72:  
+                if (opcion > 1) opcion--;
+                break;
+            case 80: 
+                if (opcion < 8) opcion++;
+                break;
+            case 'a': 
+				opcion = 1;
+				tecla = 13;
+				break;
+            case 'b': 
+				opcion = 2;
+				tecla = 13;
+				break;
+            case 'c': 
+				opcion = 3;
+				tecla = 13;
+				break;				
+            case 'm': 
+				opcion = 4;
+				tecla = 13;
+				break;
+            case 'o': 
+				opcion = 5;
+				tecla = 13;
+				break;
+            case 'd': 
+				opcion = 6;
+				tecla = 13;
+				break;
+            case 'r': 
+				opcion = 7;
+				tecla = 13;
+				break;
+            case 's': 
+				opcion = 8;
+				tecla = 13;
+				break;														
+        }
+	}while(tecla != 13);
+	system("cls");
+	return opcion;
+}
